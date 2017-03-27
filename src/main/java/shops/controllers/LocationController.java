@@ -1,8 +1,8 @@
 package shops.controllers;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import shops.models.Shop;
-import shops.models.ShopAddress;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,22 +24,14 @@ public class LocationController {
     LocationService locationService;
 
     @RequestMapping(method=GET)
-    public ResponseEntity<Shop> getShop() {
-        return new ResponseEntity<>(getTestShop(), HttpStatus.OK);
+    public ResponseEntity<Shop> getNearestShop(@RequestBody Pair<Double, Double> location) {
+        Shop nearestShop = locationService.getNearestShop(location);
+        return new ResponseEntity<>(nearestShop, HttpStatus.OK);
     }
 
     @RequestMapping(method=POST)
     public ResponseEntity<Shop> addOrUpdateLocation(@RequestBody Shop shop) {
-        System.out.println(">>++>>" + shop.toString());
         return new ResponseEntity<>(locationService.addOrUpdateShop(shop), HttpStatus.OK);
-    }
-
-    private Shop getTestShop() {
-        Shop testShop = new Shop("MyNewShop");
-        ShopAddress address = new ShopAddress();
-        address.setStreetNumber("10");
-        address.setPostCode("SW1");
-        return testShop;
     }
 
 }

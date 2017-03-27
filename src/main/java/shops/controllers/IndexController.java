@@ -14,7 +14,7 @@ public class IndexController implements ErrorController {
 
     @RequestMapping(value = PATH)
     public String error() {
-        return "Error handling in DB shops.app";
+        return "There was an error in the Shops application. Please try again later.";
     }
 
     @Override

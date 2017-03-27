@@ -3,7 +3,7 @@ package shops.models;
 /**
  * Created by admin on 26/03/2017.
  */
-public class AbstractVersionedEntity {
+public abstract class VersionedEntity {
 
     protected int version;
 

@@ -1,7 +1,12 @@
 package shops.services;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import shops.models.Shop;
+import shops.models.ShopAddress;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +17,12 @@ import java.util.Map;
 @Service
 public class LocationService {
 
-    public Map<String, Shop> knownShops = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(LocationService.class);
+
+    @Autowired
+    private GeolocationService geolocationService;
+
+    private Map<String, Shop> knownShops = new HashMap<>();
 
     public Shop addOrUpdateShop(Shop shop) {
         if (knownShops.containsKey(shop.getName())) {
@@ -21,23 +31,31 @@ public class LocationService {
         return addShop(shop);
     }
 
-    public Shop getShop(String shopName) {
-        return knownShops.get(shopName);
+    public Shop getNearestShop(Pair<Double, Double> location) {
+        return geolocationService.findClosestNeighbour(knownShops, location);
     }
 
     protected synchronized Shop addShop(Shop newShop) {
-        System.out.println("Adding new shop: " + newShop);
         newShop.setVersion(1);
+        injectPosition(newShop);
+        LOG.info("Adding new shop: " + newShop);
         return knownShops.put(newShop.getName(), newShop);
     }
 
     protected synchronized Shop updateShop(Shop newShop) {
-        System.out.println("Updating shop: " + newShop);
         String shopName = newShop.getName();
         Shop prevShop = knownShops.get(shopName);
         int newVersion = prevShop.getVersion() + 1;
         newShop.setVersion(newVersion);
+        newShop.getAddress().setPosition(prevShop.getAddress().getPosition());
+        LOG.info("Updating shop: " + newShop);
         return knownShops.put(shopName, newShop);
+    }
+
+    private void injectPosition(Shop newShop) {
+        ShopAddress address = newShop.getAddress();
+        Pair<Double, Double> position = geolocationService.getPositionForAddress(address);
+        address.setPosition(position);
     }
 
 }

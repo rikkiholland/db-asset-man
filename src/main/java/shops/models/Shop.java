@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Created by admin on 26/03/2017.
  */
-public class Shop extends AbstractVersionedEntity {
+public class Shop extends VersionedEntity {
 
     @JsonProperty("shopName")
     private String name;
@@ -39,7 +39,7 @@ public class Shop extends AbstractVersionedEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
 
         if (o == this) return true;
         if (!(o instanceof Shop)) {
@@ -52,7 +52,7 @@ public class Shop extends AbstractVersionedEntity {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(version, name, address);
     }
 
